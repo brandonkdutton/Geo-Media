@@ -1,0 +1,13 @@
+.leaflet-container {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0px, 0px, 0px, 0px;
+}
+
+.custom-content-wraper {
+    border-width: 1px;
+    border-style: solid;
+    height: 100px;
+    overflow-y: auto;
+    font-size: 5pt;
+}
