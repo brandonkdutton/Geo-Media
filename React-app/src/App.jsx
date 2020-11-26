@@ -4,13 +4,17 @@ import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-d
 import Register from './users/Register';
 import Login from './users/Login';
 import Logout from './users/Logout';
-import Home from './Home/Home';
+import HomeWrapper from './Home/reducerContextWrappers/HomeContextWrapper';
 
-function App() {
+
+function App(props) {
   return (
+
     <Router>
       <Switch>
-        <Route exact path='/' component={Home} />
+
+        <Route exact path='/' component={HomeWrapper}/>
+
         <Route exact path='/register' component={Register} />
         <Route exact path='/login' component={Login} />
         <Route exact path='/logout' component={Logout} />

@@ -1,50 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import Drawer from './postsDrawer/drawer';
 import Map from '../map/Map';
-import { useLocations } from './locationHook';
-import { usePostsFromPostId } from './postHook';
+import { locationContext } from './reducerContextWrappers/LocationContextWrapper';
+import { postsContext } from './reducerContextWrappers/PostsContextWrapper';
 
 export default function Home(props) {
-    const [drawerOpen, setDrawerOpen] = useState(false);
-    const [openId, setOpenId] = useState(-1);
+    const { locationState, locationDispatch } = useContext(locationContext);
+    const { postsState, postsDispatch } = useContext(postsContext);
 
-    const { locationData, nearLocIds, addLocation } = useLocations();
-    const { postsById, addPostToLocation } = usePostsFromPostId(openId, addLocation);
+    // fetch initial geolocation and list of all existing location ids
+    // also fetchs list of near location id's once updateGeo dispatch has finished
+    useEffect(() => {
+        new Promise((onResolve) => {
+            locationDispatch({type: 'updateGeo', payload: {onResolve}});
+        }).then(res => {
+            locationDispatch({type: 'updateNear', payload: res.geoLocation});
+        });
+        locationDispatch({type: 'updateAll', payload: null});
+    },[]);
 
-    const handleDrawerOpen = (locId=null) => {
-        if(locId !== openId)
-            handleDrawerClose(openId);
+    // keeps track of last fetched post id to prevent duplicate fetches. -2 is default because it will never occure naturally
+    const [lastPostsId, setLastsPostsId] = useState(-2);
 
-        setDrawerOpen(true);
-        setOpenId(locId);
-    };
-
-    const handleDrawerClose = (locId=null) => {
-        setDrawerOpen(false);
-        setOpenId(null);
-    };
-
-    const handleDrawer = {
-        handleDrawerOpen: handleDrawerOpen,
-        handleDrawerClose: handleDrawerClose,
-    };
+    // refreshes the current post data whenever the current post id changes and is not null
+    useEffect(() => {
+        if (locationState.current && lastPostsId !== locationState.current) {
+            postsDispatch({type: 'getAllFromLocId', payload: {
+                locId: locationState.current
+            }});
+            setLastsPostsId(locationState.current);
+        }
+    },[locationState]);
 
     return (
         <>
-            <Drawer 
-                closeDrawer={() => setDrawerOpen(false)} 
-                drawerState={drawerOpen}
-                postsToShow={postsById}
-                locationId={openId}
-                nearLocationIds={nearLocIds}
-                addPostFnc={addPostToLocation}
-            />
-            <Map 
-                handleDrawer={handleDrawer} 
-                drawerState={drawerOpen} 
-                locationData={locationData}
-                nearLocIds={nearLocIds}
-            />
+            <Drawer postsToShow={postsState.posts}/>
+            <Map/>
         </>
     );
 

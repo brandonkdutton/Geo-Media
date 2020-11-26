@@ -4,7 +4,7 @@
         the expanded and replyingTo contexts
 */
 
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import Card from '@material-ui/core/Card';
@@ -18,9 +18,9 @@ import Typography from '@material-ui/core/Typography';
 import { red } from '@material-ui/core/colors';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
-// context imports
-import { expandedPostsContext } from '../ExpandedContextWrapper';
-import { replyingToContext } from '../ReplyingToContextWrapper';
+import { expandedPostsContext } from '../reducerContextWrappers/ExpandedContextWrapper';
+import { replyingToContext } from '../reducerContextWrappers/ReplyingToContextWrapper';
+import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -55,14 +55,14 @@ const useStyles = makeStyles((theme) => ({
 export default function PostCard(props) {
     const classes = useStyles();
 
-    // destructure postObj data and reducers
     const { post_id, username, timestamp, content, replies } = props.postObj;
-    const { expandedState, expandedDispatch } = React.useContext(expandedPostsContext);
-    const { replyingToState, replyingToDispatch } = React.useContext(replyingToContext);
+    const { expandedState, expandedDispatch } = useContext(expandedPostsContext);
+    const { replyingToState, replyingToDispatch } = useContext(replyingToContext);
+    const { locationState } = useContext(locationContext);
 
-    // bools indate if post is expanded and/or if post is currentley being replied to
     const thisPostExpanded = expandedState.includes(post_id);
     const replyingToThisPost = replyingToState === post_id;
+    const nearEnoughToReply = locationState.near.includes(locationState.current);
 
     // toggle expansion/collapse of this post's reply section
     const onExpandButtonClicked = () => {
@@ -97,7 +97,7 @@ export default function PostCard(props) {
                 <CardHeader
                     avatar={
                         <Avatar className={classes.avatar}>
-                            a
+                            {username.charAt(0)}
                     </Avatar>
                     }
                     title={username}
@@ -110,9 +110,8 @@ export default function PostCard(props) {
                 </CardContent>
 
                 <CardActions className={classes.actionArea}>
-
                     {/* Reply button */}
-                    <Button disabled={false} onClick={onReplyButtonClicked}>
+                    <Button disabled={!nearEnoughToReply} onClick={onReplyButtonClicked}>
                         {replyingToThisPost ? 'Cancel' : 'Reply'}
                     </Button>
 

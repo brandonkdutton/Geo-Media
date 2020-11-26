@@ -1,12 +1,11 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { Typography, IconButton } from '@material-ui/core';
 import CloseRoundedIcon from '@material-ui/icons/CloseRounded';
 
-// context imports
-import { nearLocationIdsContext, locationIdContext } from '../nonReducerContexts';
+import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -20,17 +19,16 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-export default function BlankCard(props) {
+export default function BlankCard() {
     const classes = useStyles();
 
-    const nearLocationIds = React.useContext(nearLocationIdsContext);
-    const locationId = React.useContext(locationIdContext);
+    const { locationState, locationDispatch } = useContext(locationContext);
 
+    //returns the approapriate message to be shown in the post stack's header card
     const headerCardText = () => {
-        //returns the approapriate message to be shown in the post stack's header card
-        if(locationId === -1)
+        if(locationState.current === -1)
             return "You're the first person to visit this area!";
-        if(nearLocationIds.includes(locationId))
+        if(locationState.near.includes(locationState.current))
             return "You're near enough to post here.";
 
         return "You're too far away to post here.";
@@ -44,7 +42,7 @@ export default function BlankCard(props) {
                 </Typography>
 
                 <IconButton>
-                    <CloseRoundedIcon onClick={props.closeDrawer}/>
+                    <CloseRoundedIcon onClick={() => locationDispatch({type: 'setCurrent', payload: null})}/>
                 </IconButton>
             </CardContent>
         </Card>

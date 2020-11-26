@@ -8,8 +8,9 @@ import TextareaAutosize from '@material-ui/core/TextareaAutosize';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
 // context imports
-import { replyingToContext } from '../ReplyingToContextWrapper';
-import { locationIdContext, addPostFncContext } from '../nonReducerContexts';
+import { replyingToContext } from '../reducerContextWrappers/ReplyingToContextWrapper';
+import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
+import { postsContext } from '../reducerContextWrappers/PostsContextWrapper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -40,36 +41,66 @@ const useStyles = makeStyles((theme) => ({
 
 export default function WriteCard(props) {
     const classes = useStyles();
+
     const [text, setText] = useState('');
     const [posting, setPosting] = useState();
 
     const { post_id } = props.postObj;
 
-    const locationId = useContext(locationIdContext);
-    const addPostFnc = useContext(addPostFncContext);
     const { replyingToState, replyingToDispatch } = useContext(replyingToContext);
+    const { locationState, locationDispatch } = useContext(locationContext);
+    const { postsDispatch } = useContext(postsContext);
 
     const replyingToThisPost = replyingToState === post_id;
 
-    // clears the form, removes the spinner, closes reply box
-    const onFinishedPosting = () => {
+     // helper function dispatches an action to add the a post to the current location
+     const addPostToLocation = async (locId, parentId, content) => {
+        await new Promise((onResolve, onReject) => {
+            postsDispatch({
+                type: 'addPostToLoc', payload: {
+                    locId: locId,
+                    parentId: parentId,
+                    content: content,
+                    onResolve: onResolve,
+                }
+            });
+        });
+
+        // refresh posts with new posts from the api
+        postsDispatch({type: 'getAllFromLocId', payload: {locId: locId}});
+
+        // clean up writecard
         setPosting(false);
         setText('');
-
-        if(replyingToThisPost)
-            replyingToDispatch({type: 'set', payload: null});
+        if (replyingToThisPost)
+            replyingToDispatch({ type: 'set', payload: null });
     };
 
-    // validates form, sets the spinner, dispatches the api call
+    // validates form, sets the spinner, dispatches the api call to add a post
     const onPostButtonClicked = async () => {
-        if(text === '')
+        if (text === '')
             return alert('Your post must have content');
 
         setPosting(true);
-        
         const parentId = post_id;
-        await addPostFnc(locationId, parentId, text);
-        onFinishedPosting();
+
+        // if the post location has not been added yet, add it before adding post
+        if (locationState.current === -1) {
+            // await creation of new location
+            new Promise((onResolve, onReject) => {
+                locationDispatch({
+                    type: 'createNew', payload: {
+                        coords: locationState.geoLocation,
+                        onResolve: onResolve,
+                        onReject: onReject
+                    }
+                });
+            })
+            // add post to new location
+            .then(res1 => addPostToLocation(res1.current, parentId, text));        
+        } else {
+            addPostToLocation(locationState.current, parentId, text);
+        }
     };
 
     return (
@@ -78,11 +109,11 @@ export default function WriteCard(props) {
                 (
                     <>
                         <CardContent>
-                            <TextareaAutosize 
-                                className={classes.textArea} 
-                                rowsMin={4} 
+                            <TextareaAutosize
+                                className={classes.textArea}
+                                rowsMin={4}
                                 value={text}
-                                placeholder={'Your post content...'} 
+                                placeholder={'Your post content...'}
                                 onChange={(e) => setText(e.target.value)}
                             />
                         </CardContent>
@@ -90,7 +121,7 @@ export default function WriteCard(props) {
                             <Button onClick={onPostButtonClicked}>Post</Button>
                         </CardActions>
                     </>
-                ):(
+                ) : (
                     <CardContent className={classes.spinnerBox}>
                         <CircularProgress />
                     </CardContent>

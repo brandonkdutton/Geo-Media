@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
@@ -7,10 +7,7 @@ import Collapse from '@material-ui/core/Collapse';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PostStack from './PostStack';
 
-// context imports
-import PostContextWrapper from '../ExpandedContextWrapper';
-import ReplyingToContextWrapper from '../ReplyingToContextWrapper';
-import { locationIdContext, addPostFncContext, nearLocationIdsContext } from '../nonReducerContexts';
+import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
 
 const drawerWidth = '40%';
 const useStyles = makeStyles((theme) => ({
@@ -46,6 +43,9 @@ export default function PersistentDrawerLeft(props) {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
+    // used to check if drawer should be open or not. ie. if current location id is not null
+    const { locationState } = useContext(locationContext);
+
     return (
         <div className={classes.root}>
             <CssBaseline />
@@ -53,32 +53,17 @@ export default function PersistentDrawerLeft(props) {
                 className={classes.drawer}
                 variant="persistent"
                 anchor={isMobile ? 'bottom' : 'left'}
-                open={props.drawerState}
-                classes={{ paper: classes.drawerPaper}}
+                open={locationState.current !== null}
+                classes={{ paper: classes.drawerPaper }}
             >
                 <div className={classes.allowPointerEvents}>
                     <List>
-                        <Collapse in={true}>
+                        <Collapse in={locationState.current !== null && props.postsToShow}>
 
-                            {/* Pass all contexts down the post stack */}
-                            <PostContextWrapper>
-                                <ReplyingToContextWrapper>
-                                    <locationIdContext.Provider value={props.locationId}>
-                                        <addPostFncContext.Provider value={props.addPostFnc}>
-                                            <nearLocationIdsContext.Provider value={props.nearLocationIds}>
-
-                                                <PostStack
-                                                    postsToShow={props.postsToShow}
-                                                    handleDrawer={props.handleDrawer}
-                                                    closeDrawer={props.closeDrawer}
-                                                />
-                                                
-                                            </nearLocationIdsContext.Provider>
-                                        </addPostFncContext.Provider>
-                                    </locationIdContext.Provider>
-                                </ReplyingToContextWrapper>
-                            </PostContextWrapper>
-
+                            {/* posts object is passed in props because it's conveniant for recursiveley rendering the post stack */}
+                            <PostStack
+                                postsToShow={props.postsToShow}
+                            />
                         </Collapse>
                     </List>
                 </div>

@@ -16,7 +16,6 @@ const ReplyingToContextWrapper = (props) => {
     const initialState = null;
 
     const reducer = (initialState, action) => {
-        debugger;
         switch(action.type) {
             // set the id of the post being replied to
             case 'set':

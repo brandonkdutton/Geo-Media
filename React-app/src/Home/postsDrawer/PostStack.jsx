@@ -1,19 +1,17 @@
 /*
     - Recursiveley renders the posts in their indented structure
 */
-
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Collapse from '@material-ui/core/Collapse';
 import Grid from '@material-ui/core/Grid';
 import HeaderCard from './BlankCard';
 import PostCard from './PostCard';
 import WriteCard from './WriteCard';
+import Dropper from './PostStackDropper';
 
-// context imports
-import { expandedPostsContext } from '../ExpandedContextWrapper';
-import { replyingToContext } from '../ReplyingToContextWrapper';
-
+import { replyingToContext } from '../reducerContextWrappers/ReplyingToContextWrapper';
+import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
 
 const useStyles = makeStyles((theme) => ({
     marginStyle: {
@@ -23,68 +21,21 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-const Dropper = (props) => {
-
-    // destructure post data and reducers
-    const { post_id, username, timestamp, content, replies } = props.postObj;
-    const { expandedState } = React.useContext(expandedPostsContext);
-    const { replyingToState, replyingToDispatch } = React.useContext(replyingToContext);
-
-    // bools indicate if this current post's comment section and/or if it is currenlty being replied to
-    const thisPostExpanded = expandedState.includes(post_id);
-    const replyingToThisPost = replyingToState === post_id;
-
-    return (<>
-
-        {/* The post */}
-        <Grid item style={{ 'width': `${props.width}%` }}>
-            <PostCard 
-                postObj={props.postObj}
-            />
-        </Grid>
-
-        {/* Collapse contains the post's replies and WriteCard */}
-        <Grid item style={{ 'width': `${props.width}%`, 'marginBottom': (thisPostExpanded ? '0px' : '-8px') }}>
-            <Collapse in={thisPostExpanded} timeout="auto" unmountOnExit>
-                <Grid container direction="column" justify="flex-start" alignItems="flex-end" spacing={1}>
-
-                    {/* The post's WriteCard. Collapsed if not currently replying to post */}
-                    <Grid item style={{ 'width': `${props.width * props.shrinkFactor}%`, 'marginBottom': (replyingToThisPost ? '0px' : '-8px') }}>
-                        <Collapse in={replyingToThisPost} timeout="auto" unmountOnExit>
-                                <WriteCard
-                                    postObj={props.postObj}
-                                />
-                        </Collapse>
-                    </Grid>
-
-                    {/* Recursiveley render the post's replies */}
-                    {props.postObj.replies.map((child) =>
-                        props.generatePosts(child, props.width * props.shrinkFactor)
-                    )}
-
-                </Grid>
-            </Collapse>
-        </Grid>
-
-    </>);
-};
-
 
 const PostStack = (props) => {
     const classes = useStyles();
     const shrinkFactor = 0.95;
 
-    // context for replyingTo reducer
-    const { replyingToState } = React.useContext(replyingToContext);
+    const { replyingToState } = useContext(replyingToContext);
+    const { locationState } = useContext(locationContext);
 
-    // bool indicating if the root (default) post is the post being replied to
-    const replyingToRootPost = replyingToState === null;
+    // true if current geolocation is near enough to post to this location
+    const canPostToThisLocation = locationState.near.includes(locationState.current);
 
     const generatePosts = (postObj, width = 100) => {
-        // bool indicates whether this instance of the base case post is being rendered
-        const replyingToBaseCasePost = replyingToState === postObj.post_id;
+        const replyingToBaseCasePost = (replyingToState === postObj.post_id) && canPostToThisLocation;
 
-        // the base case for the recursive generatePosts function
+        // this is the base case for the recursive generatePosts function
         if (postObj.replies.length === 0) {
             return (
                 <>
@@ -103,11 +54,11 @@ const PostStack = (props) => {
                                 />
                         </Collapse>
                     </Grid>
-
                 </>
             );
         }
 
+        {/* Recursive rendering of non-root and not-base-case post cards */}
         return (
             <Dropper
                 width={width}
@@ -118,20 +69,21 @@ const PostStack = (props) => {
         );
     };
 
+    const replyingToRootPost = ((replyingToState === null) && canPostToThisLocation) || ((locationState.near.length === 0) && (locationState.current === -1));
+
     return (
         <Grid container direction="column" justify="flex-start" alignItems="flex-end" spacing={1} className={classes.marginStyle}>
-
+            {/* The header/title card that is always on top of the post stack */}
             <Grid item style={{ 'width': '100%' }}>
-                <HeaderCard 
-                    headerData={props.headerData}
-                    closeDrawer={props.closeDrawer}
-                />
+                <HeaderCard/>
             </Grid>
 
+            {/* The actual stack of posts */}
             {props.postsToShow.map((rootPost) => (
                 generatePosts(rootPost)
             ))}
 
+            {/* The writecard that always sits at the bottom of the post stack */}
             <Grid item style={{ 'width': `100%`, 'marginBottom': (replyingToRootPost ? '0px' : '-8px') }}>
                 <Collapse in={replyingToRootPost} timeout="auto" unmountOnExit>
                         <WriteCard
@@ -139,7 +91,6 @@ const PostStack = (props) => {
                         />
                 </Collapse>
             </Grid>
-    
         </Grid>
     );
 
