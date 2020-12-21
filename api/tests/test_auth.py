@@ -9,7 +9,7 @@ def test_login_token_auth(app):
     """ Test that a jwt login token can be decoded and validated """
 
     payload = {
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=600),
+        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=0, seconds=86400),
         'iat': datetime.datetime.utcnow(),
         'user_id': 123
     }

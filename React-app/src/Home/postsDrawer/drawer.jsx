@@ -3,7 +3,6 @@ import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Drawer from '@material-ui/core/Drawer';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import List from '@material-ui/core/List';
-import Collapse from '@material-ui/core/Collapse';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import PostStack from './PostStack';
 
@@ -33,6 +32,7 @@ const useStyles = makeStyles((theme) => ({
     allowPointerEvents: {
         pointerEvents: 'auto',
         overflowY: 'auto',
+        overflowX: 'hidden',
     },
 }
 ));
@@ -58,13 +58,10 @@ export default function PersistentDrawerLeft(props) {
             >
                 <div className={classes.allowPointerEvents}>
                     <List>
-                        <Collapse in={locationState.current !== null && props.postsToShow}>
-
-                            {/* posts object is passed in props because it's conveniant for recursiveley rendering the post stack */}
-                            <PostStack
-                                postsToShow={props.postsToShow}
-                            />
-                        </Collapse>
+                        {/* posts object is passed in props because it's conveniant for recursiveley rendering the post stack */}
+                        <PostStack
+                            postsToShow={props.postsToShow}
+                        />
                     </List>
                 </div>
             </Drawer>

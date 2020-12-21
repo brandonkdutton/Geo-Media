@@ -1,12 +1,17 @@
 import React, { useState, useContext, useEffect } from 'react';
 import Drawer from './postsDrawer/drawer';
 import Map from '../map/Map';
+import UserAvatarButton from '../users/AvatarButton';
 import { locationContext } from './reducerContextWrappers/LocationContextWrapper';
 import { postsContext } from './reducerContextWrappers/PostsContextWrapper';
+import { currentUserContext } from '../users/CurrentUserContextWrapper';
 
-export default function Home(props) {
+export default function Home() {
     const { locationState, locationDispatch } = useContext(locationContext);
     const { postsState, postsDispatch } = useContext(postsContext);
+    const { currentUserState, currentUserDispatch } = useContext(currentUserContext);
+
+    const[doneFetchingUserData, setDoneFetchingUserData] = useState(false);
 
     // fetch initial geolocation and list of all existing location ids
     // also fetchs list of near location id's once updateGeo dispatch has finished
@@ -17,6 +22,15 @@ export default function Home(props) {
             locationDispatch({type: 'updateNear', payload: res.geoLocation});
         });
         locationDispatch({type: 'updateAll', payload: null});
+
+        // fetched logged in user data using a jwt token in local storage. 
+        // set state to true when an attempt to fetch is complete regardless of outcome
+        new Promise((onResolve, onReject) => {
+            currentUserDispatch({type: 'getUserData', payload: {onResolve, onReject}});
+        }).finally(any => {
+            setDoneFetchingUserData(true);
+        });
+
     },[]);
 
     // keeps track of last fetched post id to prevent duplicate fetches. -2 is default because it will never occure naturally
@@ -34,6 +48,7 @@ export default function Home(props) {
 
     return (
         <>
+            <UserAvatarButton doneFetchingUserData={doneFetchingUserData}/>
             <Drawer postsToShow={postsState.posts}/>
             <Map/>
         </>

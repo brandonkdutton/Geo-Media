@@ -11,6 +11,8 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import { replyingToContext } from '../reducerContextWrappers/ReplyingToContextWrapper';
 import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
 import { postsContext } from '../reducerContextWrappers/PostsContextWrapper';
+import { currentUserContext } from '../../users/CurrentUserContextWrapper';
+import { globalSnackbarContext } from '../../GlobalSnackbarWrapper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -50,8 +52,13 @@ export default function WriteCard(props) {
     const { replyingToState, replyingToDispatch } = useContext(replyingToContext);
     const { locationState, locationDispatch } = useContext(locationContext);
     const { postsDispatch } = useContext(postsContext);
+    const { currentUserState, currentUserDispatch } = useContext(currentUserContext);
+    const openSnackbar = useContext(globalSnackbarContext);
 
+    const canPostToThisLocation = locationState.near.includes(locationState.current) || ((locationState.near.length === 0) && (locationState.current === -1));
     const replyingToThisPost = replyingToState === post_id;
+    const isLoggedIn = currentUserState.isLoggedIn;
+
 
      // helper function dispatches an action to add the a post to the current location
      const addPostToLocation = async (locId, parentId, content) => {
@@ -61,7 +68,9 @@ export default function WriteCard(props) {
                     locId: locId,
                     parentId: parentId,
                     content: content,
+                    userId: currentUserState.userId,
                     onResolve: onResolve,
+                    onReject: onReject,
                 }
             });
         });
@@ -78,8 +87,11 @@ export default function WriteCard(props) {
 
     // validates form, sets the spinner, dispatches the api call to add a post
     const onPostButtonClicked = async () => {
+        if (!currentUserState.isLoggedIn)
+            return openSnackbar('You must be logged in to post', 'error');
+
         if (text === '')
-            return alert('Your post must have content');
+            return openSnackbar('Your post must have content', 'error');
 
         setPosting(true);
         const parentId = post_id;
@@ -111,14 +123,17 @@ export default function WriteCard(props) {
                         <CardContent>
                             <TextareaAutosize
                                 className={classes.textArea}
+                                disabled={!isLoggedIn || !canPostToThisLocation}
                                 rowsMin={4}
                                 value={text}
-                                placeholder={'Your post content...'}
+                                placeholder={!canPostToThisLocation ? 'Too far away to post...' : (isLoggedIn ? 'Your post content...' : 'Login to post...')}
                                 onChange={(e) => setText(e.target.value)}
                             />
                         </CardContent>
                         <CardActions disableSpacing>
-                            <Button onClick={onPostButtonClicked}>Post</Button>
+                            <Button onClick={onPostButtonClicked} disabled={!isLoggedIn || !canPostToThisLocation}>
+                                {!canPostToThisLocation ? 'Too far away to post' : (isLoggedIn ? 'Post' : 'Login to Post')}
+                            </Button>
                         </CardActions>
                     </>
                 ) : (

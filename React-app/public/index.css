@@ -1,3 +1,6 @@
 .postStyle {
     color: pink;
 }
+* {
+    box-sizing: border-box;
+}

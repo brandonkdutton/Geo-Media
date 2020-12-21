@@ -36,23 +36,19 @@ class Register(Resource):
 
         db = get_db()
         cursor = db.cursor()
-        error = None
 
         if not username:
-            error = 'Username is required.'
-        elif not password:
-            error = 'Password is required.'
-        else:
-            cursor.execute('SELECT id FROM user WHERE username = (%s)', (username))
-            if cursor.fetchone() is not None:
-                error = 'user {} is already registered.'.format(username)
+            return {'error': 'Username is required.'}, 400
+        if not password:
+            return {'error': 'Password is required.'}, 400
+        
+        cursor.execute('SELECT id FROM user WHERE username = (%s)', (username))
+        if cursor.fetchone() is not None:
+            return {'error': 'user {} is already registered.'.format(username)}, 403
                 
-        if error is None:
-            hash_password = generate_password_hash(password)
-            cursor.execute('INSERT INTO user (username,password) VALUES (%s,%s)', (username, hash_password))
-            db.commit()
-            error = 'Regestration successfull.'
+        
+        hash_password = generate_password_hash(password)
+        cursor.execute('INSERT INTO user (username,password) VALUES (%s,%s)', (username, hash_password))
+        db.commit()
 
-        return {
-            'error': error
-        }, 200
+        return {'username': username}, 200

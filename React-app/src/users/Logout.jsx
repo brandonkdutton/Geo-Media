@@ -1,15 +1,21 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { globalSnackbarContext } from '../GlobalSnackbarWrapper';
 
-const Logout = () => {
+const Logout = (props) => {
+
+    const openSnackbar = useContext(globalSnackbarContext);
+
     let message;
 
-    if(sessionStorage.getItem('login_token')) {
-        sessionStorage.removeItem('login_token');
+    if(localStorage.getItem('jwt')) {
+        localStorage.removeItem('jwt');
         message = 'Logout successfull.'
     } else {
         message = 'No user is currentley logged in.';
     }
-    return <h3>{message}</h3>
+    openSnackbar(message, 'success');
+    props.history.push('/');
+    return (null);
 }
 
 export default Logout;

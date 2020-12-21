@@ -12,7 +12,7 @@ def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
 
     api = Api(app)
-    cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:*"}})
+    cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
     #test_config = None
     if test_config is None:
@@ -28,6 +28,7 @@ def create_app(test_config=None):
     from . import user
     from . import locations
     api.add_resource(user.Register, '/api/user/register')
+    api.add_resource(user.User_Data, '/api/user/data')
     api.add_resource(user.Login, '/api/user/login')
     api.add_resource(locations.Near, '/api/location/near')
     api.add_resource(locations.Posts, '/api/location/post')

@@ -5,7 +5,7 @@
     - Intended to wrap the PostStack componant
  */
 
-import React, { createContext, useEffect, useReducer } from 'react';
+import React, { createContext, useEffect, useReducer, useState } from 'react';
 
 const locationContext = createContext(null);
 
@@ -18,19 +18,32 @@ const middleWare = (dispatch) => {
             // if browser has geolocaiton enabled, fetches and injects geo coordinates into payload
             // payload: onResolve
             case 'updateGeo':
-                (() => {              
+                (() => {          
                     if(navigator.geolocation) {
                         navigator.geolocation.getCurrentPosition((pos) => {
                             const newAction = Object.assign({}, action);
-                            newAction.payload.coords = [pos.coords.latitude, pos.coords.longitude];
+                            
+                            //obfuscate exact coordinates to protect user privacy to within aproximateley +- 1.5 miles
+                            const obfuscatedLat = pos.coords.latitude + (Math.floor(Math.random() * 1.5) * (Math.random() < 0.5 ? 1 : -1))/10;
+                            const obfuscatedLon = pos.coords.longitude + (Math.floor(Math.random() * 1.5) * (Math.random() < 0.5 ? 1 : -1))/10;
+
+                            newAction.payload.coords = [obfuscatedLat, obfuscatedLon];
                             newAction.payload.geoLocationEnabled = true;
+                            newAction.payload.loadingGeoLocation = false;
                             dispatch(newAction);
+                            return;
+                        }, (error) => {
+                            const newAction = Object.assign({}, action);
+                            newAction.payload.geoLocationEnabled = false;
+                            newAction.payload.loadingGeoLocation = false;
+                            dispatch(newAction);
+                            return;
                         });
                     } else {
                         alert("Geolocation is not supported by your browser. Some of this app's features won't work without geolocation.");
                         const newAction = Object.assign({}, action);
                         newAction.payload.geoLocationEnabled = false;
-                        newAction.payload.coords = [0,0];
+                        newAction.payload.loadingGeoLocation = false;
                         dispatch(newAction);
                     }
                 })();
@@ -93,7 +106,9 @@ const LocationContextWrapper = (props) => {
         geoLocation: [0, 0],
         near: [],
         allLocations: [],
-        geoLocationEnabled: true,
+        geoLocationEnabled: false,
+        loadingGeoLocation: true,
+        geoPermission: 'denied',
         onDispatchSuccess: () => null,
     };
 
@@ -117,9 +132,10 @@ const LocationContextWrapper = (props) => {
             case 'updateGeo':
                 return (() => {
                     const newState = Object.assign({}, initialState);
-                    newState.geoLocation = action.payload.coords;
+                    action.payload.coords && (newState.geoLocation = action.payload.coords);
                     newState.onDispatchSuccess = action.payload.onResolve;
                     newState.geoLocationEnabled = action.payload.geoLocationEnabled;
+                    newState.loadingGeoLocation = action.payload.loadingGeoLocation;
                     return newState;
                 })();
             // updates the list of all locations fetched form the api
@@ -144,6 +160,13 @@ const LocationContextWrapper = (props) => {
                     newState.onDispatchSuccess = action.payload.onResolve;
                     return newState;
                 })();
+            // updates geolocation permission status
+            case 'updageGeoPermission':
+                return (() => {
+                    const newState = Object.assign({}, initialState);
+                    newState.geoPermission = action.payload.permission;
+                    return newState;
+                })();
             // do not change replying to id
             default:
                 return initialState;
@@ -157,6 +180,29 @@ const LocationContextWrapper = (props) => {
     useEffect(() => {
         state.onDispatchSuccess(state);
     },[state]);
+
+    // updates local state: geoPermission whenever the user updates their geolocation preferences
+    // this is used to show or hide the loading spinner and checkmark
+    // Note: this is not supported on IOS or by Safari, hence the try/catch
+    useEffect(() => {
+        if(!navigator.permissions) {
+            dispatch({type: 'updageGeoPermission', payload: {permission: 'granted'}});
+            return;
+        }
+
+        navigator.permissions.query({ name: 'geolocation' }).then(result => {
+            result.onchange = event => dispatch({
+                type: 'updageGeoPermission',
+                payload: {permission: event.target.state}
+            });
+
+            // set the initial state 
+            dispatch({
+                type: 'updageGeoPermission',
+                payload: {permission: result.state}
+            });
+        });
+    },[]);
 
     // object to provide reducer as context
     const contextVal = {

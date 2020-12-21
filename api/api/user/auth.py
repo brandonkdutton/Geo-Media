@@ -12,6 +12,6 @@ def jwt_auth(auth_token):
         payload = jwt.decode(auth_token, current_app.config.get('SECRET_KEY'), algorithms=['HS256'])
         return payload
     except jwt.ExpiredSignatureError:
-        return 'Expired Token'
+        return None # Expired Token
     except jwt.InvalidTokenError:
-        return 'Invalid Token'
+        return None # Invalid Token

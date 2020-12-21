@@ -17,7 +17,7 @@ const middleWare = (dispatch) => {
                     fetch(uri).then((response) => {
                         response.json().then((res) => {
                             const newAction = Object.assign({}, action);
-                            newAction.payload = res['posts'];
+                            newAction.payload.posts = res['posts'];
                             dispatch(newAction);
                         });
                     });
@@ -30,7 +30,7 @@ const middleWare = (dispatch) => {
                 (() => {
                     const uri = `${process.env.REACT_APP_API_BASE_URI}/location/post?loc_id=${action.payload.locId}`;
                     const data = {
-                        'user_id': 1,
+                        'user_id': action.payload.userId,
                         'parent_id': action.payload.parentId,
                         'content': action.payload.content,
                     };
@@ -40,6 +40,8 @@ const middleWare = (dispatch) => {
                         body: JSON.stringify(data),
                     }).then(res => {
                         dispatch(action);
+                    }).catch(error => {
+                        action.payload.onReject(error);
                     });
                 })();
                 break;
@@ -54,6 +56,7 @@ const PostsContextWrapper = (props) => {
 
     // id of the post being replied to.
     const initialState = {
+        chachedLocationId: null,
         posts: [],
         onDispatchSuccess: () => null,
     };
@@ -64,7 +67,8 @@ const PostsContextWrapper = (props) => {
             case 'getAllFromLocId':
                 return (() => {
                     const newState = Object.assign({}, initialState);
-                    newState.posts = action.payload;
+                    newState.posts = action.payload.posts;
+                    newState.chachedLocationId = action.payload.locId;
                     return newState;
                 })();
             // updates the new state with the promise to resolve once the new post has been successfully added

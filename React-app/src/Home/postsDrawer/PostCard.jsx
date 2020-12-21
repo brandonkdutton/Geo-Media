@@ -21,6 +21,7 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { expandedPostsContext } from '../reducerContextWrappers/ExpandedContextWrapper';
 import { replyingToContext } from '../reducerContextWrappers/ReplyingToContextWrapper';
 import { locationContext } from '../reducerContextWrappers/LocationContextWrapper';
+import { currentUserContext } from '../../users/CurrentUserContextWrapper';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -59,10 +60,12 @@ export default function PostCard(props) {
     const { expandedState, expandedDispatch } = useContext(expandedPostsContext);
     const { replyingToState, replyingToDispatch } = useContext(replyingToContext);
     const { locationState } = useContext(locationContext);
+    const { currentUserState } = useContext(currentUserContext);
 
     const thisPostExpanded = expandedState.includes(post_id);
     const replyingToThisPost = replyingToState === post_id;
     const nearEnoughToReply = locationState.near.includes(locationState.current);
+    const isLoggedIn = currentUserState.isLoggedIn;
 
     // toggle expansion/collapse of this post's reply section
     const onExpandButtonClicked = () => {
@@ -90,6 +93,24 @@ export default function PostCard(props) {
             expandedDispatch({type: 'add', payload: post_id});
     };
 
+    // formats an sql timstamp string into: 'mm/dd/yy, hour:minute(pm/am)
+    const toReadableTimestamp = (sqlTimestamp) => {
+        const halfs = sqlTimestamp.split(' ');
+        const dateFragments = halfs[0].split('-');
+        const timeFragments = halfs[1].split(':');
+        
+        const intHour = parseInt(timeFragments[0]);
+        let timeSuffix = 'am';
+        if(intHour > 12) {
+            timeFragments[0] = (intHour - 12).toString();
+            timeSuffix = 'pm';
+        }
+
+        const formated = `${dateFragments[1]}/${dateFragments[2]}/${dateFragments[0]} ${timeFragments[0]}:${timeFragments[1]}:${timeFragments[2]} +0000`;
+        const inLocalTime = new Date(formated).toLocaleString("en-US");
+        return inLocalTime;
+    };
+
     return (
         <>
             <Card className={classes.root}>
@@ -98,10 +119,10 @@ export default function PostCard(props) {
                     avatar={
                         <Avatar className={classes.avatar}>
                             {username.charAt(0)}
-                    </Avatar>
+                        </Avatar>
                     }
                     title={username}
-                    subheader={timestamp}
+                    subheader={toReadableTimestamp(timestamp)}
                 />
 
                 {/* Renders the textual content of the post */}
@@ -111,8 +132,8 @@ export default function PostCard(props) {
 
                 <CardActions className={classes.actionArea}>
                     {/* Reply button */}
-                    <Button disabled={!nearEnoughToReply} onClick={onReplyButtonClicked}>
-                        {replyingToThisPost ? 'Cancel' : 'Reply'}
+                    <Button disabled={!nearEnoughToReply || !isLoggedIn} onClick={onReplyButtonClicked}>
+                        {isLoggedIn ? (replyingToThisPost ? 'Cancel' : 'Reply') : 'Login to Reply'}
                     </Button>
 
                     {/* Collapse button */}
