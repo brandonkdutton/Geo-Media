@@ -3,9 +3,9 @@
     - Provedes entire app with a function to trigger a snackbar notification via context.
 */
 
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
-import React, { createContext, useState } from 'react';
+import Snackbar from "@material-ui/core/Snackbar";
+import MuiAlert from "@material-ui/lab/Alert";
+import React, { createContext, useState } from "react";
 
 const globalSnackbarContext = createContext(null);
 
@@ -13,20 +13,19 @@ const globalSnackbarContext = createContext(null);
 const GlobalSnackbarWrapper = (props) => {
   const defaultDuration = 6000;
 
-  const[open, setOpen] = useState(false);
-  const[message, setMessage] = useState('');
-  const[severity, setSeverity] = useState('');
-  const[duration, setDuration] = useState(defaultDuration);
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [severity, setSeverity] = useState("");
+  const [duration, setDuration] = useState(defaultDuration);
 
   // applies custom styling to the mui alert componant
-  const Alert = (props) => {
+  const Alert = props => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   };
 
-  const handleOpen = (message, severity, duration=defaultDuration) => {
-    if(open || !message || !severity)
-      return;
-    
+  const handleOpen = (message, severity, duration = defaultDuration) => {
+    if (open || !message || !severity) return;
+
     setSeverity(severity);
     setMessage(message);
     setDuration(duration);
@@ -39,7 +38,6 @@ const GlobalSnackbarWrapper = (props) => {
 
   return (
     <globalSnackbarContext.Provider value={handleOpen}>
-
       {props.children}
 
       <Snackbar open={open} autoHideDuration={duration} onClose={handleClose}>
@@ -47,7 +45,6 @@ const GlobalSnackbarWrapper = (props) => {
           {message}
         </Alert>
       </Snackbar>
-
     </globalSnackbarContext.Provider>
   );
 };

@@ -15,7 +15,8 @@ CREATE TABLE post (
     parent_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     content VARCHAR(512),
-    PRIMARY KEY(post_id)
+    PRIMARY KEY(post_id),
+    FOREIGN KEY (user_id) REFERENCES user(id)
 );
 CREATE TABLE loc (
     id INT AUTO_INCREMENT,
