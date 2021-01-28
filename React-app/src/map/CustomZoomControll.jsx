@@ -26,7 +26,7 @@ const CustomZoomControl = (props) => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"));
 
-  // no zoom controll is needed on mobile devices
+  // no zoom control is needed on mobile devices
   if (isMobile) {
     return null;
   }

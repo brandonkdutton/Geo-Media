@@ -27,7 +27,6 @@ function App() {
                 path="/"
                 render={(props) => <HomeWrapper {...props} />}
               />
-
               <Route
                 exact
                 path="/register"

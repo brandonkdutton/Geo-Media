@@ -1,6 +1,6 @@
 /*
-    - Context higher order componant which wrapps the entire app from inside App.jsx
-    - Provedes entire app with a function to trigger a snackbar notification via context.
+    - Context higher order component which wraps the entire app from inside App.jsx
+    - Provides entire app with a function to trigger a snackbar notification via context.
 */
 
 import Snackbar from "@material-ui/core/Snackbar";
@@ -18,8 +18,8 @@ const GlobalSnackbarWrapper = (props) => {
   const [severity, setSeverity] = useState("");
   const [duration, setDuration] = useState(defaultDuration);
 
-  // applies custom styling to the mui alert componant
-  const Alert = props => {
+  // applies custom styling to the mui alert component
+  const Alert = (props) => {
     return <MuiAlert elevation={6} variant="filled" {...props} />;
   };
 
@@ -40,7 +40,12 @@ const GlobalSnackbarWrapper = (props) => {
     <globalSnackbarContext.Provider value={handleOpen}>
       {props.children}
 
-      <Snackbar open={open} autoHideDuration={duration} onClose={handleClose}>
+      <Snackbar
+        open={open}
+        autoHideDuration={duration}
+        onClose={handleClose}
+        ClickAwayListenerProps={{ mouseEvent: "onMouseUp" }}
+      >
         <Alert onClose={handleClose} severity={severity}>
           {message}
         </Alert>
