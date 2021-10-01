@@ -1,26 +1,50 @@
-# Geo-Media
-A Location based message board to encourage you to go new places. Full stack, responsive, mobile friendly. 
+# Geo-Media-Refactor-V2
 
-Whenever you visit somewhere new you can create the first post for that area. People who visit that area can then comment or make their own posts. You can view posts from anywhere, but can only post to locations within 25 miles of where you are at the time.
+## What's this?
 
-This is a work in progress.
+A location-based message board allowing users to share, comment, and document the current situation anywhere in the world.
 
-Live version of the app: https://geomedia.brandondutton.com/
+## Live app:
 
-To run react app in development mode:
-1. Navigate to /React-App directory for all the following steps.
-2. Run "npm install".
-3. Run "npm start".
+<a href="https://geomedia.brandondutton.com">geomedia.brandondutton.com</a>
 
-To run api in development mode:
-1. Navigate to /api directory for all of the following steps.
-2. Run "pip install requirements.txt"
-3. Enter your database connection info into config.py
-4. Enter your secret key into field in config.py
-3. Run "export FLASK_APP=api"
-4. Run "flask init-db"
-5. Run "flask run"
+## Code highlights:
 
-To install on a web server use any standard configuration for a react app with a flask api. Nginx configuration and ubuntu service files are provided in /server-configs directory
+<a href="/front-end/src/redux/thunks/">Redux thunks</a>
 
+<a href="/front-end/src/redux/slices">Redux Slices with entity adapter</a>
 
+<a href="/front-end/src/pages/home/components/postDrawer">Custom components using Material-Ui</a>
+
+<a href="/back_end/tests/test_posts_at_location.py">Unit test using mocks and monkey patching</a>
+
+<a href="/back_end/api/Resources/Posts/query.py">Complicated SQL queries</a>
+
+<a href="/back_end/api/schema.sql">SQL schema</a>
+
+<a href="/back_end/conftest.py">Pytest fixtures</a>
+
+<a href="/back_end/api/Resources">RESTfull resources</a>
+
+<a href="/back_end/tests">Other unit tests</a>
+
+## Stack:
+
+#### Front end:
+
+- Typescript
+- React
+- Redux
+- Material-ui
+
+#### Back end:
+
+- Python
+- Flask-RESTfull
+- AWS Cognito
+- MySQL
+
+#### Server:
+
+- Nginx with reverse proxy to wsgi server
+- EC2 instance

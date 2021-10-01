@@ -1,0 +1,7 @@
+{
+  "Locations": [
+    { "locId": 1, "lat": 100, "lng": -100 },
+    { "locId": 2, "lat": 110, "lng": -110 },
+    { "locId": 3, "lat": 120, "lng": -120 }
+  ]
+}

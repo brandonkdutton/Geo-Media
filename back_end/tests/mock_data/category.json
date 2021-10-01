@@ -1,0 +1,8 @@
+{
+  "Categories": [
+    { "categoryId": 1, "categoryName": "cat1" },
+    { "categoryId": 2, "categoryName": "cat2" },
+    { "categoryId": 3, "categoryName": "cat3" },
+    { "categoryId": 4, "categoryName": "cat4" }
+  ]
+}

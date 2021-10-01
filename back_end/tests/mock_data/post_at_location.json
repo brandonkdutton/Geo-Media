@@ -1,0 +1,99 @@
+{
+  "Users": [
+    {
+      "userId": 1,
+      "cognitoSub": "123",
+      "userName": "user1",
+      "email": "123@456.com",
+      "emailVerified": true
+    }
+  ],
+  "Locations": [
+    {
+      "locId": 1,
+      "lat": 0,
+      "lng": 0
+    }
+  ],
+  "Categories": [
+    {
+      "categoryId": 1,
+      "categoryName": "cat1"
+    },
+    {
+      "categoryId": 2,
+      "categoryName": "cat2"
+    },
+    {
+      "categoryId": 3,
+      "categoryName": "cat3"
+    }
+  ],
+  "UserPosts": [
+    {
+      "postId": 1,
+      "locId": 1,
+      "userId": 1,
+      "postTitle": "title 1",
+      "postContent": "content 1",
+      "createdAt": "2021-09-30 01:48:29"
+    },
+    {
+      "postId": 2,
+      "locId": 1,
+      "userId": 1,
+      "postTitle": "title 2",
+      "postContent": "content 2",
+      "createdAt": "2021-09-30 01:48:29"
+    },
+    {
+      "postId": 3,
+      "locId": 1,
+      "userId": 1,
+      "postTitle": "title 3",
+      "postContent": "content 3",
+      "createdAt": "2021-09-30 01:48:29"
+    }
+  ],
+  "UserReplies": [
+    {
+      "replyId": 1,
+      "userId": 1,
+      "postId": 1,
+      "replyContent": "rely1",
+      "createdAt": "2021-09-30 01:48:29"
+    },
+    {
+      "replyId": 2,
+      "userId": 1,
+      "postId": 1,
+      "replyContent": "rely2",
+      "createdAt": "2021-09-30 01:48:29"
+    },
+    {
+      "replyId": 3,
+      "userId": 1,
+      "postId": 2,
+      "replyContent": "rely3",
+      "createdAt": "2021-09-30 01:48:29"
+    }
+  ],
+  "PostCategories": [
+    {
+      "postId": 1,
+      "categoryId": 1
+    },
+    {
+      "postId": 1,
+      "categoryId": 2
+    },
+    {
+      "postId": 3,
+      "categoryId": 3
+    },
+    {
+      "postId": 2,
+      "categoryId": 1
+    }
+  ]
+}
