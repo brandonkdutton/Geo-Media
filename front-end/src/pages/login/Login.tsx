@@ -1,25 +1,37 @@
 import React from "react";
-import { withAuthenticator, AmplifySignOut } from "@aws-amplify/ui-react";
+import { Grid, Button } from "@material-ui/core";
+import { Link } from "react-router-dom";
+import { withAuthenticator } from "@aws-amplify/ui-react";
 import Amplify, { Auth } from "aws-amplify";
 import awsExports from "../../aws-exports";
 
 Amplify.configure(awsExports);
 
-function App() {
-  const jwtChallenge = (): void => {
-    Auth.currentSession()
-      .then((res) => {
-        const accessToken = res.getIdToken();
-        console.log(accessToken.payload);
-        return accessToken.getJwtToken();
-      });
-  };
+const logout = async () => {
+  await Auth.signOut();
+  window.location.reload();
+};
 
+function App() {
   return (
-    <>
-      <AmplifySignOut />
-      <button onClick={jwtChallenge}>validate jwt</button>
-    </>
+    <Grid
+      container
+      style={{ height: "100vh" }}
+      direction="column"
+      justify="center"
+      alignItems="center"
+    >
+      <Grid item>
+        <Button color="primary" component={Link} to="/">
+          Continue to app
+        </Button>
+      </Grid>
+      <Grid item>
+        <Button color="primary" onClick={logout}>
+          Logout
+        </Button>
+      </Grid>
+    </Grid>
   );
 }
 
