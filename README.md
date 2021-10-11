@@ -46,6 +46,7 @@ A location-based message board allowing users to share, comment, and document th
 - Flask-RESTfull
 - AWS Cognito
 - MySQL
+- AWS Cognito
 
 #### Server:
 
