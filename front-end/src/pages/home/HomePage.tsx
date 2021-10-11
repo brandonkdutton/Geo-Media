@@ -3,7 +3,11 @@ import Map from "./components/map/Map";
 import PostsDrawer from "./components/postDrawer/Drawer";
 import AvatarButton from "./components/AvatarButton";
 import { fetchLocations } from "../../redux/thunks/locationsThunks";
-import { fetchCategories } from "../../redux/thunks/categoriesThunks";
+import {
+  fetchCategories,
+  fetchCategoriesForLocation,
+} from "../../redux/thunks/categoriesThunks";
+import { selectAllPostsForCurrentLocation } from "../../redux/slices/postsSlice";
 import { fetchPostsForLocation } from "../../redux/thunks/postsThunks";
 import { RootState } from "../../redux/store";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -19,6 +23,11 @@ const HomePage: FC = () => {
     dispatch(fetchLocations(null));
     dispatch(fetchCategories(0));
   }, [dispatch]);
+
+  useEffect(() => {
+    const locId = openLocation ?? -1;
+    dispatch(fetchCategoriesForLocation(locId));
+  }, [openLocation, dispatch]);
 
   useEffect(() => {
     if (openLocation)

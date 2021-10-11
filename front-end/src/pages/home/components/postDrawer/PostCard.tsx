@@ -91,6 +91,9 @@ const PostCard: FC<props> = ({
     dispatch(setReplyingToId(idToSet));
   };
 
+  const created = new Date((post ?? reply)!.createdAt);
+  const timestamp = created.toLocaleDateString();
+
   if (!post && !reply) return null;
   else
     return (
@@ -110,7 +113,7 @@ const PostCard: FC<props> = ({
                   </Avatar>
                 }
                 title={(post ?? reply)!.userName}
-                subheader={(post ?? reply)!.createdAt}
+                subheader={timestamp}
               />
             </Grid>
             {post && <CategoriesBar categories={post.categories} />}

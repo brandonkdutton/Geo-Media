@@ -1,5 +1,5 @@
 from flask import request
-from back_end.api.db import get_db
+from api.db import get_db
 from .Auth import decode_cognito_jwt
 from flask_restful import Resource
 from .query import fetch_user_data

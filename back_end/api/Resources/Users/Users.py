@@ -1,5 +1,5 @@
 from flask import request
-from back_end.api.db import get_db
+from api.db import get_db
 from flask_restful import Resource
 from werkzeug.security import generate_password_hash
 

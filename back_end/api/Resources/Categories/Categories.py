@@ -1,7 +1,6 @@
 from flask import request
 from flask_restful import Resource
-import pymysql
-from back_end.api.db import get_db
+from api.db import get_db
 
 
 class Categories(Resource):

@@ -10,6 +10,7 @@ import {
   fetchCategories,
   createNewCategory,
   FetchCategoriesResult,
+  fetchCategoriesForLocation,
 } from "../thunks/categoriesThunks";
 
 type AdditionalState = {
@@ -17,6 +18,7 @@ type AdditionalState = {
   createPending: boolean;
   fetchPending: boolean;
   filterTags: Category[];
+  atOpenLocation: Category[];
 };
 export type CategoriesState = EntityState<Category> & AdditionalState;
 
@@ -31,6 +33,7 @@ const initialState: CategoriesState =
     createPending: false,
     fetchPending: false,
     filterTags: [],
+    atOpenLocation: [],
   });
 
 type Action<T> = { type: string; payload: T };
@@ -41,6 +44,14 @@ const categoriesSlice = createSlice({
   reducers: {
     setFilterTags(state: CategoriesState, action: Action<Category[]>) {
       state.filterTags = action.payload;
+    },
+    addAtOpenLocation(state: CategoriesState, action: Action<Category[]>) {
+      const existingIds = new Set<number>(
+        state.atOpenLocation.map((c) => c.id)
+      );
+      state.atOpenLocation = state.atOpenLocation.concat(
+        action.payload.filter((c) => !existingIds.has(c.id))
+      );
     },
   },
   extraReducers: (builder) => {
@@ -71,10 +82,30 @@ const categoriesSlice = createSlice({
     builder.addCase(createNewCategory.rejected, (state: CategoriesState) => {
       state.createPending = false;
     });
+    builder.addCase(
+      fetchCategoriesForLocation.fulfilled,
+      (state: CategoriesState, action: Action<FetchCategoriesResult>) => {
+        state.atOpenLocation = action.payload.categories;
+        state.fetchPending = false;
+      }
+    );
+    builder.addCase(
+      fetchCategoriesForLocation.pending,
+      (state: CategoriesState) => {
+        state.fetchPending = true;
+      }
+    );
+    builder.addCase(
+      fetchCategoriesForLocation.rejected,
+      (state: CategoriesState) => {
+        state.atOpenLocation = [];
+        state.fetchPending = false;
+      }
+    );
   },
 });
 
-export const { setFilterTags } = categoriesSlice.actions;
+export const { setFilterTags, addAtOpenLocation } = categoriesSlice.actions;
 
 export const {
   selectAll: selectAllCategories,

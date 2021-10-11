@@ -1,4 +1,4 @@
-from back_end.api.db import get_db
+from api.db import get_db
 
 
 def generate_cat_str(cats):

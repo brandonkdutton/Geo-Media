@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
-from back_end.api.Resources.Users.Auth import JWT
-from back_end.api.db import get_db
+from api.Resources.Users.Auth import JWT
+from api.db import get_db
 from .query import query_categories, query_replies
 
 

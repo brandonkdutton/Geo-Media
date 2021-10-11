@@ -1,9 +1,9 @@
 from flask import request
 from flask_restful import Resource
 from .query import query, query_categories, query_replies
-from back_end.api.db import get_db
-from back_end.api.Resources.Users import JWT
-from back_end.api.Resources.Users import fetch_user_data
+from api.db import get_db
+from api.Resources.Users import JWT
+from api.Resources.Users import fetch_user_data
 
 
 class PostsAtLocation(Resource):

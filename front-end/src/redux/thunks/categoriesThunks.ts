@@ -24,6 +24,24 @@ export const fetchCategories = createAsyncThunk<
   return result;
 });
 
+export const fetchCategoriesForLocation = createAsyncThunk<
+  FetchCategoriesResult,
+  number,
+  { rejectValue: FetchError }
+>("categories/fetchAtLocation", async (locId: number, thunkApi) => {
+  const req = await fetch(
+    `${process.env.REACT_APP_API_URI}/categories/atLocation/${locId}`
+  );
+
+  if (req.status < 200 || req.status >= 400) {
+    const error: FetchError = await req.json();
+    thunkApi.rejectWithValue({ message: error.message });
+  }
+
+  const result: FetchCategoriesResult = await req.json();
+  return result;
+});
+
 export const createNewCategory = createAsyncThunk<
   Category,
   string,

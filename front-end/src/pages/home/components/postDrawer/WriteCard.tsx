@@ -9,7 +9,8 @@ import Button from "@material-ui/core/Button";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import AssignTagsBar from "./AssignTagsBar";
-
+import { setOpenId } from "../../../../redux/slices/locationsSlice";
+import { addAtOpenLocation } from "../../../../redux/slices/categoriesSlice";
 import { createNewCategory } from "../../../../redux/thunks/categoriesThunks";
 import {
   postPostsForLocation,
@@ -128,8 +129,10 @@ const WriteCard: FC<props> = ({ type, postId, refMap, scrollToPostById }) => {
       const coords = locId === -1 ? currentGeoLocation : unconfirmedLoc;
       const newLocation = await dispatch(createLocation(coords));
 
-      if (newLocation.meta.requestStatus === "fulfilled")
+      if (newLocation.meta.requestStatus === "fulfilled") {
         currentLocId = (newLocation.payload as Location).id;
+        dispatch(setOpenId(currentLocId));
+      }
     }
 
     const postToCreate: PostToCreate = {
@@ -146,6 +149,7 @@ const WriteCard: FC<props> = ({ type, postId, refMap, scrollToPostById }) => {
       setPendingTag("");
       const postRefId = `post_${(actionPayload.payload as Post).postId}`;
       setLatestPost(postRefId);
+      dispatch(addAtOpenLocation((actionPayload.payload as Post).categories));
     }
   };
 

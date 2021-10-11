@@ -2,7 +2,7 @@ import React, { FC } from "react";
 import { MapContainer, TileLayer } from "react-leaflet";
 import { useAppSelector } from "../../../../redux/hooks";
 import { selectAllLocations } from "../../../../redux/slices/locationsSlice";
-import { Location, Geolocation, LocId } from "../../../../types/locationTypes";
+import { Location } from "../../../../types/locationTypes";
 import MapEventsController from "./MapEventsController";
 import LocationMarker from "./LocationMarker";
 import ZoomControl from "./ZoomControl";
@@ -11,12 +11,6 @@ import "./mapStyle.css";
 const MapComponent: FC = () => {
   const initialZoom = 4;
   const locations: Location[] = useAppSelector(selectAllLocations);
-  const geolocation: Geolocation = useAppSelector(
-    ({ locations }) => locations.geolocation
-  );
-  const nearLocIds: LocId[] = useAppSelector(
-    ({ locations }) => locations.currentLocationIds
-  );
   const unconfirmedLocation = useAppSelector(
     ({ locations }) => locations.unconfirmedLocation
   );
@@ -35,12 +29,6 @@ const MapComponent: FC = () => {
           coordinates={loc.coordinates}
         />
       ))}
-      {/* {nearLocIds.length === 0 && geolocation.lat && geolocation.lng && (
-        <LocationMarker
-          locId={-1}
-          coordinates={[geolocation.lat as number, geolocation.lng as number]}
-        />
-      )} */}
       {unconfirmedLocation.lat && unconfirmedLocation.lng && (
         <LocationMarker
           locId={-2}

@@ -1,6 +1,6 @@
 server {
     listen 80;
-    root /home/ubuntu/geo-media/build;
+    root /home/ubuntu/geomedia/build;
     index index.html;
 
     location / {
@@ -12,8 +12,6 @@ server {
         expires 1y;
         add_header Cache-Control "public";
     }
-
-    location 
 
     location /api {
         include proxy_params;

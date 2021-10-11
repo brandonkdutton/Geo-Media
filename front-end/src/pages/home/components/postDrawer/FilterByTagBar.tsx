@@ -11,10 +11,7 @@ import Typography from "@mui/material/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Category } from "../../../../types/postTypes";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks";
-import {
-  selectAllCategories,
-  setFilterTags,
-} from "../../../../redux/slices/categoriesSlice";
+import { setFilterTags } from "../../../../redux/slices/categoriesSlice";
 
 const useStyles = makeStyles((theme) => ({
   scroll: {
@@ -31,10 +28,10 @@ const FilterByTagBar: FC = () => {
   const classes = useStyles();
   const dispatch = useAppDispatch();
   const [tagsToShow, setTagsToShow] = useState<Category[]>([]);
-  const selectedTags = useAppSelector(
-    ({ categories }) => categories.filterTags
-  );
-  const tags = useAppSelector(selectAllCategories);
+  const [tags, selectedTags] = useAppSelector(({ categories }) => [
+    categories.atOpenLocation,
+    categories.filterTags,
+  ]);
 
   useEffect(() => {
     const newTagsToshow = tags.filter((tag) => !selectedTags.includes(tag));

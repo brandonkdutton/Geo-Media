@@ -6,7 +6,7 @@ A location-based message board allowing users to share, comment, and document th
 
 ## Live app:
 
-<a href="https://geomedia.brandondutton.com">geomedia.brandondutton.com</a>
+<a href="https://geomedia.brandon-dutton.com">geomedia.brandon-dutton.com</a>
 
 ## Code highlights:
 
@@ -18,7 +18,10 @@ A location-based message board allowing users to share, comment, and document th
 
 <a href="/back_end/tests/test_posts_at_location.py">Unit test using mocks and monkey patching</a>
 
-<a href="/back_end/api/Resources/Posts/query.py">Complicated SQL queries</a>
+#### Complicated SQL queries
+
+- <a href="back_end/api/Resources/Categories/Categories_At_Location.py">Multi-level sub queries</a>
+- <a href="/back_end/api/Resources/Posts/query.py">Multi-level joins</a>
 
 <a href="/back_end/api/schema.sql">SQL schema</a>
 

@@ -1,7 +1,7 @@
 from flask import request
 from flask_restful import Resource
-from back_end.api.Resources.Users import JWT, fetch_user_data
-from back_end.api.db import get_db
+from api.Resources.Users import JWT, fetch_user_data
+from api.db import get_db
 
 
 class ReplyAtPost(Resource):

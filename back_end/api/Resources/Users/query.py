@@ -1,4 +1,4 @@
-from back_end.api.db import get_db
+from api.db import get_db
 
 def fetch_user_data(user_id=None, sub=None):
     """Fetches user data from db given a user id or a sub"""
