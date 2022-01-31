@@ -4,10 +4,6 @@
 
 A location-based message board allowing users to share, comment, and document the current situation anywhere in the world.
 
-## Live app:
-
-<a href="https://geomedia.brandon-dutton.com">geomedia.brandon-dutton.com</a>
-
 ## Code highlights:
 
 <a href="/front-end/src/redux/thunks/">Redux thunks</a>
